@@ -66,6 +66,7 @@ def randomize_these_nodes(bnet, some_node_names):
         nd.potential.set_to_random()
         nd.potential.normalize_self()
 
+
 def get_default_nd_to_size(dot_file, hidden_nd_names):
     nodes, _ = DotTool.read_dot_file(dot_file)
     nd_to_size = {}
@@ -76,6 +77,7 @@ def get_default_nd_to_size(dot_file, hidden_nd_names):
                                   f" not in full node list")
         nd_to_size[nd_name] = 3
     return nd_to_size
+
 
 def calculate_do_query_prob(bnet):
     node_list = list(bnet.nodes)
@@ -89,7 +91,7 @@ def calculate_do_query_prob(bnet):
             if not ampu_pot:
                 ampu_pot = nd.potential
             else:
-                ampu_pot = ampu_pot*nd.potential
+                ampu_pot = ampu_pot * nd.potential
 
     full_pot = ampu_pot * nd_x.potential
 
@@ -150,7 +152,6 @@ def compare_two_do_queries(dot_file,
     pprint(ampu_prob_y_bar_x)
 
 
-
 if __name__ == "__main__":
     def main(dot_file,
              hidden_nd_names,
@@ -163,6 +164,8 @@ if __name__ == "__main__":
                                draw=draw,
                                jupyter=False,
                                verbose=verbose)
+
+
     # main(dot_file="dot_atlas/napkin.dot",
     #      hidden_nd_names=["u_1", "u_2"],
     #      draw=True,

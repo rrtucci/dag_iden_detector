@@ -66,38 +66,48 @@ def randomize_these_nodes(bnet, some_node_names):
         nd.potential.set_to_random()
         nd.potential.normalize_self()
 
+def get_default_nd_to_size(dot_file, hidden_nd_names):
+    nodes, _ = DotTool.read_dot_file(dot_file)
+    nd_to_size = {}
+    for nd in nodes:
+        nd_to_size[nd] = 2
+    for nd_name in hidden_nd_names:
+        assert nd_name in nodes, (f"hidden node '{nd_name}'"
+                                  f" not in full node list")
+        nd_to_size[nd_name] = 3
+    return nd_to_size
 
 def calculate_do_query_prob(bnet):
     node_list = list(bnet.nodes)
-    amp_pot = None
-    for nd in node_list:
-        if nd.name != "x":
-            amp_pot = nd.potential
-            break
-    for nd in node_list:
-        if nd.name != "x":
-            amp_pot = amp_pot * nd.potential
 
     nd_x = bnet.get_node_named('x')
     nd_y = bnet.get_node_named('y')
 
-    full_pot = amp_pot * nd_x.potential
+    ampu_pot = None
+    for nd in node_list:
+        if nd != nd_x:
+            if not ampu_pot:
+                ampu_pot = nd.potential
+            else:
+                ampu_pot = ampu_pot*nd.potential
 
-    amp_prob_y_bar_x = None
+    full_pot = ampu_pot * nd_x.potential
+
+    ampu_prob_y_bar_x = None
     full_prob_y_bar_x = None
-    for final_pot in [amp_pot, full_pot]:
-        arr_y_bar_x = final_pot.get_new_marginal([nd_x, nd_y]).pot_arr
+    for final_pot in [ampu_pot, full_pot]:
+        arr_yx = final_pot.get_new_marginal([nd_x, nd_y]).pot_arr
         pot_y_bar_x = DiscreteCondPot(
-            False, [nd_x, nd_y], arr_y_bar_x)
+            False, [nd_x, nd_y], arr_yx)
         pot_y_bar_x.normalize_self()
-        if final_pot == amp_pot:
-            amp_prob_y_bar_x = pot_y_bar_x.pot_arr
+        if final_pot == ampu_pot:
+            ampu_prob_y_bar_x = pot_y_bar_x.pot_arr
         elif final_pot == full_pot:
             full_prob_y_bar_x = pot_y_bar_x.pot_arr
         else:
             assert None
 
-    return amp_prob_y_bar_x, full_prob_y_bar_x
+    return ampu_prob_y_bar_x, full_prob_y_bar_x
 
 
 def compare_two_do_queries(dot_file,
@@ -118,46 +128,50 @@ def compare_two_do_queries(dot_file,
     print("Random bnet1:")
     if verbose:
         print(bnet)
-    amp_prob_y_bar_x, full_prob_y_bar_x = calculate_do_query_prob(bnet)
+    ampu_prob_y_bar_x, full_prob_y_bar_x = calculate_do_query_prob(bnet)
     print()
     print("full P(y|x) for bnet1:")
     pprint(full_prob_y_bar_x)
     print()
     print("amputated P(y|x) for bnet1:")
-    pprint(amp_prob_y_bar_x)
+    pprint(ampu_prob_y_bar_x)
 
     randomize_these_nodes(bnet, hidden_nd_names)
     print("------------------------------")
     print("Random bnet2:")
     if verbose:
         print(bnet)
-    amp_prob_y_bar_x, full_prob_y_bar_x = calculate_do_query_prob(bnet)
+    ampu_prob_y_bar_x, full_prob_y_bar_x = calculate_do_query_prob(bnet)
     print()
     print("full P(y|x) for bnet2:")
     pprint(full_prob_y_bar_x)
     print()
     print("amputated P(y|x) for bnet2:")
-    pprint(amp_prob_y_bar_x)
+    pprint(ampu_prob_y_bar_x)
+
 
 
 if __name__ == "__main__":
-    def main(draw, verbose):
-        dot_file = "dot_atlas/napkin.dot"
-        hidden_nd_names = ["u_1", "u_2"]
-
-        nodes, _ = DotTool.read_dot_file(dot_file)
-        nd_to_size = {}
-        for nd in nodes:
-            nd_to_size[nd] = 2
-        for nd_name in hidden_nd_names:
-            assert nd_name in nodes, (f"hidden node '{nd_name}'"
-                                 f" not in full node list")
-            nd_to_size[nd_name] = 3
-
+    def main(dot_file,
+             hidden_nd_names,
+             draw,
+             verbose):
+        nd_to_size = get_default_nd_to_size(dot_file, hidden_nd_names)
         compare_two_do_queries(dot_file,
                                hidden_nd_names,
                                nd_to_size,
                                draw=draw,
                                jupyter=False,
                                verbose=verbose)
-    main(draw=True, verbose=True)
+    # main(dot_file="dot_atlas/napkin.dot",
+    #      hidden_nd_names=["u_1", "u_2"],
+    #      draw=True,
+    #      verbose=True)
+    main(dot_file="dot_atlas/front-door.dot",
+         hidden_nd_names=["h"],
+         draw=False,
+         verbose=False)
+    # main(dot_file="dot_atlas/back-door.dot",
+    #      hidden_nd_names=[],
+    #      draw=True,
+    #      verbose=True)

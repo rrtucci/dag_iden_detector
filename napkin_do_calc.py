@@ -105,7 +105,9 @@ def run(draw=True, jupyter=False):
     arr_zxy = final_pot.pot_arr
 
     arr_y_bar_x = final_pot.get_new_marginal([nd_x, nd_y]).pot_arr
-    pot_y_bar_x = DiscreteCondPot(False, [nd_x, nd_y], arr_y_bar_x)
+    pot_y_bar_x = DiscreteCondPot(False,
+                                  [nd_x, nd_y],
+                                  arr_y_bar_x)
     pot_y_bar_x.normalize_self()
     prob_y_bar_x = pot_y_bar_x.pot_arr
 

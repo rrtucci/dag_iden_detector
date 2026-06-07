@@ -1,5 +1,4 @@
-from potentials.DiscreteCondPot import *
-from graphs.BayesNet import *
+from adjustment_formulae import *
 from pprint import pprint
 
 
@@ -149,13 +148,6 @@ def compare_two_do_queries(dot_file,
         print()
         print(f"amputated P(y|x) for {bnet_str}:")
         pprint(ampu_prob_y_bar_x)
-        if "front-door" in dot_file:
-            print()
-            print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:")
-            pprint(get_frontdoor_adjustment_prob(bnet, ampu_pot))
-            print()
-            print(f"adjusted P(y|x) from full_pot for {bnet_str}:")
-            pprint(get_frontdoor_adjustment_prob(bnet, full_pot))
         if "back-door" in dot_file:
             print()
             print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:")
@@ -163,56 +155,26 @@ def compare_two_do_queries(dot_file,
             print()
             print(f"adjusted P(y|x) from full_pot for {bnet_str}:")
             pprint(get_backdoor_adjustment_prob(bnet, full_pot))
-
-
-def get_frontdoor_adjustment_prob(bnet, full_pot):
-    nd_names = [nd.name for nd in bnet.nodes]
-    assert {"h", "m", "x", "y"} == set(nd_names), \
-        "bnet doesn't have expected nodes"
-
-    nd_h = bnet.get_node_named('h')
-    nd_m = bnet.get_node_named('m')
-    nd_x = bnet.get_node_named('x')
-    nd_y = bnet.get_node_named('y')
-    pot_mxy = full_pot.get_new_marginal([nd_m, nd_x, nd_y])
-    pot_mx = full_pot.get_new_marginal([nd_m, nd_x])
-    pot_x = pot_mx.get_new_marginal([nd_x])
-
-    pot_my = (pot_mxy * pot_x / pot_mx).get_new_marginal([nd_m, nd_y])
-    pot_xy = (pot_my * pot_mx / pot_x).get_new_marginal([nd_x, nd_y])
-    arr_xy = pot_xy.pot_arr
-    pot_y_bar_x = DiscreteCondPot(False,
-                                  [nd_x, nd_y],
-                                  arr_xy)
-    pot_y_bar_x.normalize_self()
-    prob_y_bar_x = pot_y_bar_x.pot_arr
-    return prob_y_bar_x
-
-
-def get_backdoor_adjustment_prob(bnet, full_pot):
-    nd_names = [nd.name for nd in bnet.nodes]
-    assert {"z", "x", "y"} == set(nd_names), \
-        "bnet doesn't have expected nodes"
-
-    nd_z = bnet.get_node_named('z')
-    nd_x = bnet.get_node_named('x')
-    nd_y = bnet.get_node_named('y')
-    pot_xz = full_pot.get_new_marginal([nd_x, nd_z])
-    pot_z = full_pot.get_new_marginal([nd_z])
-    pot_xy = ((full_pot / pot_xz) * pot_z).get_new_marginal([nd_x, nd_y])
-    arr_xy = pot_xy.pot_arr
-    pot_y_bar_x = DiscreteCondPot(False,
-                                  [nd_x, nd_y],
-                                  arr_xy)
-    pot_y_bar_x.normalize_self()
-    prob_y_bar_x = pot_y_bar_x.pot_arr
-    return prob_y_bar_x
+        if "front-door" in dot_file:
+            print()
+            print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:")
+            pprint(get_frontdoor_adjustment_prob(bnet, ampu_pot))
+            print()
+            print(f"adjusted P(y|x) from full_pot for {bnet_str}:")
+            pprint(get_frontdoor_adjustment_prob(bnet, full_pot))
+        if "napkin" in dot_file:
+            print()
+            print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:")
+            pprint(get_napkin_adjustment_prob(bnet, ampu_pot))
+            print()
+            print(f"adjusted P(y|x) from full_pot for {bnet_str}:")
+            pprint(get_napkin_adjustment_prob(bnet, full_pot))
 
 
 if __name__ == "__main__":
-    def main_napkin(draw, verbose):
-        compare_two_do_queries(dot_file="dot_atlas/napkin.dot",
-                               hidden_nd_names=["u_1", "u_2"],
+    def main_backdoor(draw, verbose):
+        compare_two_do_queries(dot_file="dot_atlas/back-door.dot",
+                               hidden_nd_names=[],
                                draw=draw,
                                verbose=verbose)
 
@@ -224,12 +186,13 @@ if __name__ == "__main__":
                                verbose=verbose)
 
 
-    def main_backdoor(draw, verbose):
-        compare_two_do_queries(dot_file="dot_atlas/back-door.dot",
-                               hidden_nd_names=[],
+    def main_napkin(draw, verbose):
+        compare_two_do_queries(dot_file="dot_atlas/napkin.dot",
+                               hidden_nd_names=["u_1", "u_2"],
                                draw=draw,
                                verbose=verbose)
 
 
+    # main_backdoor(False, False)
     # main_frontdoor(False, False)
-    main_backdoor(False, False)
+    main_napkin(False, False)

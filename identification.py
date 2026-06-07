@@ -118,8 +118,6 @@ def calculate_do_query_probs(bnet, ampu_pot, full_pot):
 def compare_two_do_queries(dot_file,
                            hidden_nd_names,
                            nd_to_size=None,
-                           draw=True,
-                           jupyter=False,
                            verbose=True):
     if not nd_to_size:
         nd_to_size = get_default_nd_to_size(dot_file, hidden_nd_names)
@@ -129,8 +127,6 @@ def compare_two_do_queries(dot_file,
         nodes,
         arrows,
         nd_to_size)
-    if draw:
-        bnet.gv_draw(jupyter)
 
     for bnet_str in ["bnet1", "bnet2"]:
         if bnet_str == "bnet2":
@@ -146,50 +142,43 @@ def compare_two_do_queries(dot_file,
         print(f"full P(y|x) for {bnet_str}:")
         pprint(full_prob_y_bar_x)
         print()
-        print(f"amputated P(y|x) for {bnet_str}:")
+        print(f"amputated P(y|x) for {bnet_str}: (REQUIRES RCT)")
         pprint(ampu_prob_y_bar_x)
-        if "back-door" in dot_file:
-            print()
-            print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:")
-            pprint(get_backdoor_adjustment_prob(bnet, ampu_pot))
-            print()
-            print(f"adjusted P(y|x) from full_pot for {bnet_str}:")
-            pprint(get_backdoor_adjustment_prob(bnet, full_pot))
-        if "front-door" in dot_file:
-            print()
-            print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:")
-            pprint(get_frontdoor_adjustment_prob(bnet, ampu_pot))
-            print()
-            print(f"adjusted P(y|x) from full_pot for {bnet_str}:")
-            pprint(get_frontdoor_adjustment_prob(bnet, full_pot))
-        if "napkin" in dot_file:
-            print()
-            print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:")
-            pprint(get_napkin_adjustment_prob(bnet, ampu_pot))
+        dotf_str_to_adj_method = {
+            "back-door": get_backdoor_adjustment_prob,
+            "front-door": get_frontdoor_adjustment_prob,
+            "napkin": get_napkin_adjustment_prob}
+        adj_method = None
+        for dotf_str in dotf_str_to_adj_method:
+            if dotf_str in dot_file:
+                adj_method = dotf_str_to_adj_method[dotf_str]
+                break
+        if adj_method:
             print()
             print(f"adjusted P(y|x) from full_pot for {bnet_str}:")
-            pprint(get_napkin_adjustment_prob(bnet, full_pot))
+            pprint(adj_method(bnet, full_pot))
+            print()
+            print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:"
+                  f"(REQUIRES RCT)")
+            pprint(adj_method(bnet, ampu_pot))
 
 
 if __name__ == "__main__":
     def main_backdoor(draw, verbose):
         compare_two_do_queries(dot_file="dot_atlas/back-door.dot",
                                hidden_nd_names=[],
-                               draw=draw,
                                verbose=verbose)
 
 
     def main_frontdoor(draw, verbose):
         compare_two_do_queries(dot_file="dot_atlas/front-door.dot",
                                hidden_nd_names=["h"],
-                               draw=draw,
                                verbose=verbose)
 
 
     def main_napkin(draw, verbose):
         compare_two_do_queries(dot_file="dot_atlas/napkin.dot",
                                hidden_nd_names=["u_1", "u_2"],
-                               draw=draw,
                                verbose=verbose)
 
 

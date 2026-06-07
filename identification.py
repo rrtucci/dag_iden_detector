@@ -79,7 +79,7 @@ def get_default_nd_to_size(dot_file, hidden_nd_names):
     return nd_to_size
 
 
-def calculate_do_query_prob(bnet):
+def calculate_ampu_and_full_pots(bnet):
     node_list = list(bnet.nodes)
 
     nd_x = bnet.get_node_named('x')
@@ -92,15 +92,19 @@ def calculate_do_query_prob(bnet):
                 ampu_pot = nd.potential
             else:
                 ampu_pot = ampu_pot * nd.potential
-
     full_pot = ampu_pot * nd_x.potential
+    return ampu_pot, full_pot
 
+
+def calculate_do_query_probs(bnet, ampu_pot, full_pot):
+    nd_x = bnet.get_node_named('x')
+    nd_y = bnet.get_node_named('y')
     ampu_prob_y_bar_x = None
     full_prob_y_bar_x = None
     for final_pot in [ampu_pot, full_pot]:
-        arr_yx = final_pot.get_new_marginal([nd_x, nd_y]).pot_arr
+        arr_xy = final_pot.get_new_marginal([nd_x, nd_y]).pot_arr
         pot_y_bar_x = DiscreteCondPot(
-            False, [nd_x, nd_y], arr_yx)
+            False, [nd_x, nd_y], arr_xy)
         pot_y_bar_x.normalize_self()
         if final_pot == ampu_pot:
             ampu_prob_y_bar_x = pot_y_bar_x.pot_arr
@@ -114,10 +118,12 @@ def calculate_do_query_prob(bnet):
 
 def compare_two_do_queries(dot_file,
                            hidden_nd_names,
-                           nd_to_size,
+                           nd_to_size=None,
                            draw=True,
                            jupyter=False,
                            verbose=True):
+    if not nd_to_size:
+        nd_to_size = get_default_nd_to_size(dot_file, hidden_nd_names)
     nodes, arrows = DotTool.read_dot_file(dot_file)
 
     bnet = create_random_bnet(
@@ -127,54 +133,103 @@ def compare_two_do_queries(dot_file,
     if draw:
         bnet.gv_draw(jupyter)
 
-    print("Random bnet1:")
-    if verbose:
-        print(bnet)
-    ampu_prob_y_bar_x, full_prob_y_bar_x = calculate_do_query_prob(bnet)
-    print()
-    print("full P(y|x) for bnet1:")
-    pprint(full_prob_y_bar_x)
-    print()
-    print("amputated P(y|x) for bnet1:")
-    pprint(ampu_prob_y_bar_x)
+    for bnet_str in ["bnet1", "bnet2"]:
+        if bnet_str == "bnet2":
+            print("------------------------------")
+            randomize_these_nodes(bnet, hidden_nd_names)
+        print(f"Random {bnet_str}:")
+        if verbose:
+            print(bnet)
+        ampu_pot, full_pot = calculate_ampu_and_full_pots(bnet)
+        ampu_prob_y_bar_x, full_prob_y_bar_x = \
+            calculate_do_query_probs(bnet, ampu_pot, full_pot)
+        print()
+        print(f"full P(y|x) for {bnet_str}:")
+        pprint(full_prob_y_bar_x)
+        print()
+        print(f"amputated P(y|x) for {bnet_str}:")
+        pprint(ampu_prob_y_bar_x)
+        if "front-door" in dot_file:
+            print()
+            print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:")
+            pprint(get_frontdoor_adjustment_prob(bnet, ampu_pot))
+            print()
+            print(f"adjusted P(y|x) from full_pot for {bnet_str}:")
+            pprint(get_frontdoor_adjustment_prob(bnet, full_pot))
+        if "back-door" in dot_file:
+            print()
+            print(f"adjusted P(y|x) from ampu_pot for {bnet_str}:")
+            pprint(get_backdoor_adjustment_prob(bnet, ampu_pot))
+            print()
+            print(f"adjusted P(y|x) from full_pot for {bnet_str}:")
+            pprint(get_backdoor_adjustment_prob(bnet, full_pot))
 
-    randomize_these_nodes(bnet, hidden_nd_names)
-    print("------------------------------")
-    print("Random bnet2:")
-    if verbose:
-        print(bnet)
-    ampu_prob_y_bar_x, full_prob_y_bar_x = calculate_do_query_prob(bnet)
-    print()
-    print("full P(y|x) for bnet2:")
-    pprint(full_prob_y_bar_x)
-    print()
-    print("amputated P(y|x) for bnet2:")
-    pprint(ampu_prob_y_bar_x)
+
+def get_frontdoor_adjustment_prob(bnet, full_pot):
+    nd_names = [nd.name for nd in bnet.nodes]
+    assert {"h", "m", "x", "y"} == set(nd_names), \
+        "bnet doesn't have expected nodes"
+
+    nd_h = bnet.get_node_named('h')
+    nd_m = bnet.get_node_named('m')
+    nd_x = bnet.get_node_named('x')
+    nd_y = bnet.get_node_named('y')
+    pot_mxy = full_pot.get_new_marginal([nd_m, nd_x, nd_y])
+    pot_mx = full_pot.get_new_marginal([nd_m, nd_x])
+    pot_x = pot_mx.get_new_marginal([nd_x])
+
+    pot_my = (pot_mxy * pot_x / pot_mx).get_new_marginal([nd_m, nd_y])
+    pot_xy = (pot_my * pot_mx / pot_x).get_new_marginal([nd_x, nd_y])
+    arr_xy = pot_xy.pot_arr
+    pot_y_bar_x = DiscreteCondPot(False,
+                                  [nd_x, nd_y],
+                                  arr_xy)
+    pot_y_bar_x.normalize_self()
+    prob_y_bar_x = pot_y_bar_x.pot_arr
+    return prob_y_bar_x
+
+
+def get_backdoor_adjustment_prob(bnet, full_pot):
+    nd_names = [nd.name for nd in bnet.nodes]
+    assert {"z", "x", "y"} == set(nd_names), \
+        "bnet doesn't have expected nodes"
+
+    nd_z = bnet.get_node_named('z')
+    nd_x = bnet.get_node_named('x')
+    nd_y = bnet.get_node_named('y')
+    pot_xz = full_pot.get_new_marginal([nd_x, nd_z])
+    pot_z = full_pot.get_new_marginal([nd_z])
+    pot_xy = ((full_pot / pot_xz) * pot_z).get_new_marginal([nd_x, nd_y])
+    arr_xy = pot_xy.pot_arr
+    pot_y_bar_x = DiscreteCondPot(False,
+                                  [nd_x, nd_y],
+                                  arr_xy)
+    pot_y_bar_x.normalize_self()
+    prob_y_bar_x = pot_y_bar_x.pot_arr
+    return prob_y_bar_x
 
 
 if __name__ == "__main__":
-    def main(dot_file,
-             hidden_nd_names,
-             draw,
-             verbose):
-        nd_to_size = get_default_nd_to_size(dot_file, hidden_nd_names)
-        compare_two_do_queries(dot_file,
-                               hidden_nd_names,
-                               nd_to_size,
+    def main_napkin(draw, verbose):
+        compare_two_do_queries(dot_file="dot_atlas/napkin.dot",
+                               hidden_nd_names=["u_1", "u_2"],
                                draw=draw,
-                               jupyter=False,
                                verbose=verbose)
 
 
-    # main(dot_file="dot_atlas/napkin.dot",
-    #      hidden_nd_names=["u_1", "u_2"],
-    #      draw=True,
-    #      verbose=True)
-    main(dot_file="dot_atlas/front-door.dot",
-         hidden_nd_names=["h"],
-         draw=False,
-         verbose=False)
-    # main(dot_file="dot_atlas/back-door.dot",
-    #      hidden_nd_names=[],
-    #      draw=True,
-    #      verbose=True)
+    def main_frontdoor(draw, verbose):
+        compare_two_do_queries(dot_file="dot_atlas/front-door.dot",
+                               hidden_nd_names=["h"],
+                               draw=draw,
+                               verbose=verbose)
+
+
+    def main_backdoor(draw, verbose):
+        compare_two_do_queries(dot_file="dot_atlas/back-door.dot",
+                               hidden_nd_names=[],
+                               draw=draw,
+                               verbose=verbose)
+
+
+    # main_frontdoor(False, False)
+    main_backdoor(False, False)

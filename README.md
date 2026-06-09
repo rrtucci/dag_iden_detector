@@ -1,6 +1,6 @@
 # DAG Iden Detector
 
-![](pics/canal.jpg)
+<img src="pics/canal.jpg" alt="canal" height="200">
 
 Iden= Identifiability
 

@@ -47,7 +47,8 @@ but
 * it contains no probabilities
 of hidden variables, even when the OP has some. 
 * It can be calculated from DATA
-OBTAINED WITHOUT CONDUCTING AN RCT.
+OBTAINED WITHOUT CONDUCTING AN RCT 
+(Randomized Controlled Trial).
 
 ## What this code can and cannot do
 This repo contains python

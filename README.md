@@ -42,7 +42,7 @@ of hidden variables, even when the OP has some.
 * It can be calculated from DATA
 OBTAINED WITHOUT CONDUCTING AN RCT.
 
-## What can this code do and not do
+## What this code can and cannot do
 This repo contains python
 code for checking numerically (on 
 an OP with random CPTs)
@@ -59,16 +59,17 @@ Pearl has given adjustment formulae (AF) that
 he calls the backdoor AF and frontdoor AF.
 Cinelli has given an AF for the "Napkin" OP [here](https://stats.stackexchange.com/questions/514615/do-calculus-for-causal-diagram-7-5-from-the-book-of-why-napkin-problem) 
 
-What we show:
-Our results are presented in jupyter notebooks in the
-"jupyter_notebooks" folder. See the 
+
+Our findings are presented in jupyter notebooks in the
+**jupyter_notebooks** folder. See the 
 [SUMMARY notebook](https://github.com/rrtucci/dag_iden_detector/blob/master/jupyter_notebooks/SUMMARY.ipynb)
 for a summary of each notebook
 
+We show that:
 * the backdoor AF is correct
 * the frontdoor AF is correct
 * Cinelli's AF for the napkin OP is INCORRECT
-* We show guess a new AF for the napkin OP and show 
+* We guess an AF for the napkin OP and show 
 that it's correct
 
 

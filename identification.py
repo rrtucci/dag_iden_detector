@@ -19,8 +19,12 @@ def create_random_bnet(nodes,
     arrows: list[tuple[str, str]]
         example: [('a', 'b'), ('a', 'c')]
     nd_to_size: dict[str, int]
-        dictionary mapping node name to its size (i.e., the number of
-        values or states)
+        dictionary mapping node name to its size (i.e., the number of values
+        or states). In this function, `nd_to_size` must contain all the
+        nodes. In all other functions (for example, in `fill_nod_to_size(
+        )`), `nd_to_size` contains only nodes which you don't want to have a
+        default size. Default sizes are 2 for non-hidden nodes and 3 for
+        hidden ones.
 
     Returns
     -------
@@ -60,6 +64,25 @@ def create_random_bnet(nodes,
 
 
 def randomize_these_nodes(bnet, some_node_names):
+    """
+    This method randomizes (i.e., replaces by random ones) the CPT (
+    Conditional Probability Tables) of the nodes in the list
+    `some_node_names` in the BayesNet object bnet.
+
+    Parameters
+    ----------
+    bnet: BayesNet
+        BayesNet object created by `create_random_bnet`. BayesNet or bnet
+        stand for Bayesian network.
+    some_node_names: list[str]
+        This is a partial list of node names. Normal set equal to the
+        list of nodes that are hidden.
+
+    Returns
+    -------
+    None
+
+    """
     for name in some_node_names:
         nd = bnet.get_node_named(name)
         nd.potential.set_to_random()
@@ -67,6 +90,29 @@ def randomize_these_nodes(bnet, some_node_names):
 
 
 def fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size=None):
+    """
+    This method compiles the list of node names from the dot file
+    `dot_file`. It then produces a default dict `nd_to_size` that maps
+    hidden nodes to size 3 (i.e., they will have 3 states) and non-hidden
+    ones to 2. Then the method consults input dict `nd_to_size` and changes
+    the default size in `nd_to_size1` of those nodes mentioned in
+    `nd_to_size1`. Finally, it returns
+
+    Parameters
+    ----------
+    dot_file: str
+        dot file of the OP (Original Promise bnet.
+    hidden_nd_names: list[str]
+        names of hidden nodes
+    nd_to_size: dict[str, int] | None
+        dict mapping node name to its size. This input need only be a
+        partial list of those nodes that you don't want to have default values.
+
+    Returns
+    -------
+    list[str]
+
+    """
     nodes, _ = DotTool.read_dot_file(dot_file)
     nd_to_size1 = {}
     for nd in nodes:
@@ -83,6 +129,26 @@ def fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size=None):
 
 
 def calc_ampu_and_full_pots(bnet):
+    """
+    This method calculates the probability distribution for (1) the "full"
+    OP and (2) the "ampu" OP. By (ampu=amputated) OP, we mean a bnet whose
+    arrows entering node "x" are amputated. These two probability
+    distributions are loaded into 2 Potential objects, `full_pot` and
+    `dot_pot` which the method returns. Remember, a Potential can be thought
+    of an arbitrary function f(x,y,z) where `x,y,z` are a partial list of
+    the nodes of the OP bnet. A potential is usually used to carry either a
+    joint probability distribution like P(x,y,z) or a conditional one like
+    P(z| x, y).
+
+    Parameters
+    ----------
+    bnet: BayesNet
+
+    Returns
+    -------
+    Potential, Potential
+
+    """
     node_list = list(bnet.nodes)
 
     nd_x = bnet.get_node_named('x')
@@ -102,6 +168,23 @@ def calc_ampu_and_full_pots(bnet):
 def calc_ampu_and_full_prob_y_bar_x(bnet,
                                     ampu_pot,
                                     full_pot):
+    """
+    This takes the two Potentials `ampu_pot` and `full_pot` and calculates
+    from those the two conditional probabilities `ampu_prob_y_bar_x`,
+    `full_prob_y_bar_x'. The probabilities are of the type P(y|x) and
+    expressed as numpy arrays. `ampu_prob_y_bar_x` equals P(y|do(x)).
+
+    Parameters
+    ----------
+    bnet: BayesNet
+    ampu_pot: Potential
+    full_pot: Potential
+
+    Returns
+    -------
+    np.array, np.array
+
+    """
     nd_x = bnet.get_node_named('x')
     nd_y = bnet.get_node_named('y')
     ampu_prob_y_bar_x = None
@@ -131,6 +214,46 @@ def print_all_prob_y_bar_x(dot_file,
                            verbose=True,
                            adj_version=1,
                            num_bnet_samples=2):
+    """
+    This method and the analogous one `print_all_prob_y_bar_x_z` are the
+    only ones used in the jupyter notebooks. All others are meant to be
+    internal. This method prints 4 things for either 1 or 2 bnets. The default
+    is two bnets `num_bnet_samples=2`, but it will do just bnet if you input
+    `num_bnet_samples=1`
+
+    1. full P(y|x) for OP
+
+    2. amputated P(y|x) for OP. This requires data from an RCT to
+    calculated in real life.
+
+    3. adjusted P(y|x) from full_pot
+
+    4. adjusted P(y|x) from ampu_pot. This requires data from an RCT to
+    calculated in real life.
+
+
+    Parameters
+    ----------
+    dot_file: str
+        the dot file of the OP bnet
+    hidden_nd_names: list[str]
+        the names of the hidden nodes
+    nd_to_size: dict[str, int]| None
+        a node name to node size dict for those nodes that you don't want to
+        have default sizes.
+    verbose: bool
+        the verbose mode prints also the CPT for each node of the bnet.
+    adj_version: int
+        adjustment version. For the Napkin OP, there are current 4
+        adjustment formulae that are tested.
+    num_bnet_samples: int
+        number of random bnets considered. This can be either 1 or 2.
+
+    Returns
+    -------
+    None
+
+    """
     nd_to_size = fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size)
 
     nodes, arrows = DotTool.read_dot_file(dot_file)
@@ -186,7 +309,27 @@ def print_all_prob_y_bar_x(dot_file,
 def calc_ampu_and_full_prob_y_bar_x_z(bnet,
                                       ampu_pot,
                                       full_pot,
-                                      other_cond):
+                                      other_cond='z'):
+    """
+    The analogous method `calc_ampu_and_full_prob_y_bar_x` calculates P(
+    y|x). This method calculates P(y| x, z) instead. If you don't want the
+    name of the extra node to be conditioned on to default to 'z', you can
+    tell the method the name of your condition using the str input variable
+    `other_cond`
+
+
+    Parameters
+    ----------
+    bnet: BayesNet
+    ampu_pot: Potential
+    full_pot: Potential
+    other_cond: str
+
+    Returns
+    -------
+    np.array, np.array
+
+    """
     assert isinstance(other_cond, str)
     nd_x = bnet.get_node_named('x')
     nd_y = bnet.get_node_named('y')
@@ -219,6 +362,25 @@ def print_all_prob_y_bar_x_z(dot_file,
                              verbose=True,
                              adj_version=1,
                              num_bnet_samples=2):
+    """
+    The analogous method `print_all_prob_y_bar_x` prints 4 probabilities P(
+    y|x). This method prints 4 probabilities P(y| x, z) instead.
+
+    Parameters
+    ----------
+    dot_file: str
+    hidden_nd_names: list[str]
+    other_cond: str
+    nd_to_size: list[str, int]
+    verbose: bool
+    adj_version: int
+    num_bnet_samples: int
+
+    Returns
+    -------
+    None
+
+    """
     assert isinstance(other_cond, str)
     nd_to_size = fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size)
     nodes, arrows = DotTool.read_dot_file(dot_file)
@@ -272,18 +434,51 @@ def print_all_prob_y_bar_x_z(dot_file,
 
 if __name__ == "__main__":
     def main_backdoor(draw, verbose):
+        """
+        Parameters
+        ----------
+        draw: bool
+        verbose: bool
+
+        Returns
+        -------
+        None
+
+        """
         print_all_prob_y_bar_x(dot_file="dot_atlas/back-door.dot",
                                hidden_nd_names=[],
                                verbose=verbose)
 
 
     def main_frontdoor(draw, verbose):
+        """
+        Parameters
+        ----------
+        draw: bool
+        verbose: bool
+
+        Returns
+        -------
+        None
+
+        """
         print_all_prob_y_bar_x(dot_file="dot_atlas/front-door.dot",
                                hidden_nd_names=["h"],
                                verbose=verbose)
 
 
     def main_napkin1(draw, verbose):
+        """
+        Parameters
+        ----------
+        draw: bool
+        verbose: bool
+
+        Returns
+        -------
+        None
+
+        """
         print_all_prob_y_bar_x(dot_file="dot_atlas/napkin.dot",
                                hidden_nd_names=["u_1", "u_2"],
                                adj_version=1,
@@ -291,6 +486,17 @@ if __name__ == "__main__":
 
 
     def main_napkin2(draw, verbose):
+        """     
+        Parameters
+        ----------
+        draw: bool
+        verbose: bool
+
+        Returns
+        -------
+        None
+
+        """
         print_all_prob_y_bar_x(dot_file="dot_atlas/napkin.dot",
                                hidden_nd_names=["u_1", "u_2"],
                                adj_version=2,
@@ -298,6 +504,17 @@ if __name__ == "__main__":
 
 
     def main_napkin3(draw, verbose):
+        """
+        Parameters
+        ----------
+        draw: bool
+        verbose: bool
+
+        Returns
+        -------
+        None
+
+        """
         print_all_prob_y_bar_x(dot_file="dot_atlas/napkin.dot",
                                hidden_nd_names=["u_1", "u_2"],
                                adj_version=3,
@@ -305,6 +522,17 @@ if __name__ == "__main__":
 
 
     def main_napkin4(draw, verbose):
+        """
+        Parameters
+        ----------
+        draw: bool
+        verbose: bool
+
+        Returns
+        -------
+        None
+
+        """
         print_all_prob_y_bar_x_z(dot_file="dot_atlas/napkin.dot",
                                  hidden_nd_names=["u_1", "u_2"],
                                  other_cond="z",

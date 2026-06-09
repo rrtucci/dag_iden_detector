@@ -1,8 +1,37 @@
 from potentials.DiscreteCondPot import *
 from graphs.BayesNet import *
 
+"""
+All the methods in this file return a conditional probability P(y|x) or P(
+y|x, z) dictated by an adjustment formula (AF).
+
+The AFs considered are
+
+1. backdoor AF
+2. frontdoor AF
+3. Napkin1 AF
+4. Napkin2 AF (fails to reproduce P(y|do(x))
+5. Napkin3 AF (fails to reproduce P(y|do(x))
+6. Napkin4 AF (fails to reproduce P(y|do(x))
+
+1 to 5 return a P(y|x). 6 returns a P(y|x, z)
+
+"""
+
 
 def get_backdoor_adjustment_prob(bnet, full_pot):
+    """
+
+    Parameters
+    ----------
+    bnet: BayesNet
+    full_pot: Potential
+
+    Returns
+    -------
+    np.array
+
+    """
     nd_z = bnet.get_node_named('z')
     nd_x = bnet.get_node_named('x')
     nd_y = bnet.get_node_named('y')
@@ -19,6 +48,18 @@ def get_backdoor_adjustment_prob(bnet, full_pot):
 
 
 def get_frontdoor_adjustment_prob(bnet, full_pot):
+    """
+
+    Parameters
+    ----------
+    bnet: BayesNet
+    full_pot: Potential
+
+    Returns
+    -------
+    np.array
+
+    """
     # nd_h = bnet.get_node_named('h')
     nd_m = bnet.get_node_named('m')
     nd_x = bnet.get_node_named('x')
@@ -39,6 +80,18 @@ def get_frontdoor_adjustment_prob(bnet, full_pot):
 
 
 def get_napkin1_adjustment_prob(bnet, full_pot):
+    """
+
+    Parameters
+    ----------
+    bnet: BayesNet
+    full_pot: Potential
+
+    Returns
+    -------
+    np.array
+
+    """
     nd_w = bnet.get_node_named('w')
     nd_z = bnet.get_node_named('z')
     nd_x = bnet.get_node_named('x')
@@ -61,6 +114,18 @@ def get_napkin1_adjustment_prob(bnet, full_pot):
 
 
 def get_napkin2_adjustment_prob(bnet, full_pot):
+    """
+
+    Parameters
+    ----------
+    bnet: BayesNet
+    full_pot: Potential
+
+    Returns
+    -------
+    np.array
+
+    """
     nd_z = bnet.get_node_named('z')
     nd_x = bnet.get_node_named('x')
     nd_y = bnet.get_node_named('y')
@@ -81,6 +146,18 @@ def get_napkin2_adjustment_prob(bnet, full_pot):
 
 
 def get_napkin3_adjustment_prob(bnet, full_pot):
+    """
+
+    Parameters
+    ----------
+    bnet: BayesNet
+    full_pot: Potential
+
+    Returns
+    -------
+    np.array
+
+    """
     nd_w = bnet.get_node_named('w')
     nd_x = bnet.get_node_named('x')
     nd_y = bnet.get_node_named('y')
@@ -101,6 +178,18 @@ def get_napkin3_adjustment_prob(bnet, full_pot):
 
 
 def get_napkin4_adjustment_prob(bnet, full_pot):
+    """
+
+    Parameters
+    ----------
+    bnet: BayesNet
+    full_pot: Potential
+
+    Returns
+    -------
+    np.array
+
+    """
     nd_w = bnet.get_node_named('w')
     nd_z = bnet.get_node_named('z')
     nd_x = bnet.get_node_named('x')

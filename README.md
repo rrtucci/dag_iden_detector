@@ -53,7 +53,7 @@ OBTAINED WITHOUT CONDUCTING AN RCT
 ## What this code can and cannot do
 This repo contains python
 code for checking numerically (on 
-an OP with random CPTs)
+an OP with random CPTs (Conditional Probability Tables)
 whether an adjustment formula is 
 correct or not. The code cannot decide
 whether a do-query is identifiable or not,

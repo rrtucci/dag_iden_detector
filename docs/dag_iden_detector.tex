@@ -1,0 +1,253 @@
+
+\documentclass[12pt]{report}
+\input{bayesuvius.sty}
+\begin{document}
+
+\section{Backdoor}
+\begin{claim}
+If $OP=$
+$
+\xymatrix{
+{\rvz}\ar[d]\ar[rd]
+\\
+\rvx\ar[r]&\rvy
+}$
+then
+\beqa
+P(y | \cald \rvx=x)&=&
+\sum_{z} P(y|x, z)P(z)
+\\
+&=&
+\xymatrix{
+\EE z\ar[dr]
+\\
+x\ar[r]
+&y
+}
+\eeqa
+\end{claim}
+\proof
+
+See
+\url{https://github.com/rrtucci/dag_iden_detector} for computer
+generated  numerical proof.
+\qed
+
+\section{Frontdoor}
+
+\begin{claim}
+If $OP=$
+$
+\xymatrix{
+&*++[F-o]{\rvc}\ar[ld]\ar[rd]
+\\
+\rvx\ar[r]&\rvm\ar[r]&\rvy
+}$
+then
+
+\beqa
+P(y | \cald \rvx=x)&=&\sum_{m}
+\left[\sum_{x'}
+P(y|m, x')P(x')\right]
+P(m|x)
+\\
+&=&
+\xymatrix{
+&\EE x'\ar[dr]
+\\
+x\ar[r]
+&\sum m\ar[r]&y
+}
+\eeqa
+\end{claim}
+\proof
+
+See
+\url{https://github.com/rrtucci/dag_iden_detector} for computer
+generated  numerical proof.
+\qed
+
+\section{Napkin1}
+\begin{claim}
+If $OP=\bcen
+\xymatrix@R=1pc@C=1pc{
+&*++[F-o]{\rvu_1}\ar[ddl]\ar[ddrr]
+\\
+&*++[F-o]{\rvu_2}\ar[dl]\ar[dr]
+\\
+\rvw\ar[r]
+&\rvz\ar[r]
+&\rvx\ar[r]
+&\rvy
+}\ecen$ then
+
+\beqa
+P(y\mid \cald \rvx=x)
+&=&
+\frac{\sum_{w,z} P(x,y|w,z)P(w)P(z)}
+{\sum_y
+\text{ num}}
+\\
+&=&
+\frac{\sum_{w, z}
+P(y|x,w,z)P(x|w,z)
+P(z)
+P(w)}{\sum_y\;\text{ num}}
+\\\nonumber
+\\
+&=&
+\frac{1}{\sum_y \text{ num}}
+\bcen
+\xymatrix{
+\EE w
+\ar@/^1.5pc/[rrr]
+\ar@/_1.5pc/[rr]
+&
+\EE z
+\ar@/^1pc/[rr]
+\ar[r]
+&x\ar[r]
+&y
+}\ecen
+\eeqa
+\end{claim}
+\proof
+
+See
+\url{https://github.com/rrtucci/dag_iden_detector} for computer
+generated  numerical proof.
+\qed
+
+\section{Napkin2}
+
+\begin{claim}
+If $OP=\bcen
+\xymatrix@R=1pc@C=1pc{
+&*++[F-o]{\rvu_1}\ar[ddl]\ar[ddrr]
+\\
+&*++[F-o]{\rvu_2}\ar[dl]\ar[dr]
+\\
+\rvw\ar[r]
+&\rvz\ar[r]
+&\rvx\ar[r]
+&\rvy
+}\ecen$ then
+
+\beqa
+P(y\mid \cald \rvx=x)
+&=&
+\sum_{z} P(y|x, z)P(z)
+\\
+&=&
+\bcen
+\xymatrix{
+&\EE z
+\ar[dr]
+\\
+x\ar[rr]
+&
+&y
+}
+\ecen
+\eeqa
+
+\end{claim}
+\proof
+
+This claim is {\color{red}INCORRECT}. See
+\url{https://github.com/rrtucci/dag_iden_detector} for computer
+generated  numerical counterexample.
+\qed
+
+
+\section{Napkin3}
+
+\begin{claim}
+If $OP=\bcen
+\xymatrix@R=1pc@C=1pc{
+&*++[F-o]{\rvu_1}\ar[ddl]\ar[ddrr]
+\\
+&*++[F-o]{\rvu_2}\ar[dl]\ar[dr]
+\\
+\rvw\ar[r]
+&\rvz\ar[r]
+&\rvx\ar[r]
+&\rvy
+}\ecen$ then
+
+\beqa
+P(y\mid \cald \rvx=x)
+&=&
+\sum_{w} P(y|x, w)P(w)
+\\
+&=&
+\bcen
+\xymatrix{
+&\EE w
+\ar[dr]
+\\
+x\ar[rr]
+&
+&y
+}
+\ecen
+\eeqa
+
+\end{claim}
+\proof
+
+This claim is {\color{red}INCORRECT}. See
+\url{https://github.com/rrtucci/dag_iden_detector} for computer
+generated  numerical counterexample.
+\qed
+
+\section{Napkin4}
+\begin{claim}
+If $OP=\bcen
+\xymatrix@R=1pc@C=1pc{
+&*++[F-o]{\rvu_1}\ar[ddl]\ar[ddrr]
+\\
+&*++[F-o]{\rvu_2}\ar[dl]\ar[dr]
+\\
+\rvw\ar[r]
+&\rvz\ar[r]
+&\rvx\ar[r]
+&\rvy
+}\ecen$ then
+
+\beqa
+P(y\mid \cald \rvx=x)
+&=&
+\frac{\sum_{w} P(x,y|w,z)P(w)}
+{\sum_y
+\text{ num}}
+\\
+&=&
+\frac{\sum_{w}
+P(y|x,w,z)P(x|w,z)
+P(w)}{\sum_y\;\text{ num}}
+\\\nonumber
+\\
+&=&
+\frac{1}{\sum_y \text{ num}}
+\bcen
+\xymatrix{
+\EE w
+\ar@/^1.5pc/[rrr]
+\ar@/_1.5pc/[rr]
+& z
+\ar@/^1pc/[rr]
+\ar[r]
+&x\ar[r]
+&y
+}\ecen
+\eeqa
+\end{claim}
+\proof
+
+This claim is {\color{red}INCORRECT}. See
+\url{https://github.com/rrtucci/dag_iden_detector} for computer
+generated  numerical counterexample.
+\qed
+
+\end{document}

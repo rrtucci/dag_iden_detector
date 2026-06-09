@@ -66,16 +66,20 @@ def randomize_these_nodes(bnet, some_node_names):
         nd.potential.normalize_self()
 
 
-def get_default_nd_to_size(dot_file, hidden_nd_names):
+def fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size=None):
     nodes, _ = DotTool.read_dot_file(dot_file)
-    nd_to_size = {}
+    nd_to_size1 = {}
     for nd in nodes:
-        nd_to_size[nd] = 2
+        nd_to_size1[nd] = 2
     for nd_name in hidden_nd_names:
         assert nd_name in nodes, (f"hidden node '{nd_name}'"
                                   f" not in full node list")
-        nd_to_size[nd_name] = 3
-    return nd_to_size
+        nd_to_size1[nd_name] = 3
+    if nd_to_size:
+        for nd_name in nd_to_size:
+            if nd_name in nd_to_size1:
+                nd_to_size1[nd_name] = nd_to_size[nd_name]
+    return nd_to_size1
 
 
 def calc_ampu_and_full_pots(bnet):
@@ -127,8 +131,8 @@ def print_all_prob_y_bar_x(dot_file,
                            verbose=True,
                            adj_version=1,
                            num_bnet_samples=2):
-    if not nd_to_size:
-        nd_to_size = get_default_nd_to_size(dot_file, hidden_nd_names)
+    nd_to_size = fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size)
+
     nodes, arrows = DotTool.read_dot_file(dot_file)
 
     bnet = create_random_bnet(
@@ -162,9 +166,7 @@ def print_all_prob_y_bar_x(dot_file,
             "front-door1": get_frontdoor_adjustment_prob,
             "napkin1": get_napkin1_adjustment_prob,
             "napkin2": get_napkin2_adjustment_prob,
-            "napkin3": get_napkin3_adjustment_prob,
-            "napkin4": get_napkin4_adjustment_prob,
-            "napkin5": get_napkin5_adjustment_prob}
+            "napkin3": get_napkin3_adjustment_prob}
         adj_method = None
         for dotf_str in dotf_strings:
             if dotf_str in dot_file:
@@ -192,12 +194,12 @@ def calc_ampu_and_full_prob_y_bar_x_z(bnet,
     ampu_prob_y_bar_x_z = None
     full_prob_y_bar_x_z = None
     for final_pot in [ampu_pot, full_pot]:
-        arr_zxy = final_pot.get_new_marginal(
-            [nd_z, nd_x, nd_y]).pot_arr
+        arr_xzy = final_pot.get_new_marginal(
+            [nd_x, nd_z, nd_y]).pot_arr
         pot_y_bar_x_z = DiscreteCondPot(
             False,
-            [nd_z, nd_x, nd_y],
-            arr_zxy)
+            [nd_x, nd_z, nd_y],
+            arr_xzy)
 
         pot_y_bar_x_z.normalize_self()
         if final_pot == ampu_pot:
@@ -218,8 +220,7 @@ def print_all_prob_y_bar_x_z(dot_file,
                              adj_version=1,
                              num_bnet_samples=2):
     assert isinstance(other_cond, str)
-    if not nd_to_size:
-        nd_to_size = get_default_nd_to_size(dot_file, hidden_nd_names)
+    nd_to_size = fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size)
     nodes, arrows = DotTool.read_dot_file(dot_file)
 
     bnet = create_random_bnet(
@@ -250,7 +251,7 @@ def print_all_prob_y_bar_x_z(dot_file,
         pprint(ampu_prob_y_bar_x_z)
         dotf_strings = ["napkin"]
         adj_id_to_adj_method = {
-            "napkin6": get_napkin6_adjustment_prob}
+            "napkin4": get_napkin4_adjustment_prob}
         adj_method = None
         for dotf_str in dotf_strings:
             if dotf_str in dot_file:
@@ -304,32 +305,17 @@ if __name__ == "__main__":
 
 
     def main_napkin4(draw, verbose):
-        print_all_prob_y_bar_x(dot_file="dot_atlas/napkin.dot",
-                               hidden_nd_names=["u_1", "u_2"],
-                               adj_version=4,
-                               verbose=verbose)
-
-
-    def main_napkin5(draw, verbose):
-        print_all_prob_y_bar_x(dot_file="dot_atlas/napkin.dot",
-                               hidden_nd_names=["u_1", "u_2"],
-                               adj_version=5,
-                               verbose=verbose)
-
-    def main_napkin6(draw, verbose):
         print_all_prob_y_bar_x_z(dot_file="dot_atlas/napkin.dot",
-                               hidden_nd_names=["u_1", "u_2"],
-                               other_cond = "z",
-                               adj_version=6,
-                               verbose=verbose)
-
+                                 hidden_nd_names=["u_1", "u_2"],
+                                 other_cond="z",
+                                 nd_to_size={"z": 3},
+                                 adj_version=4,
+                                 verbose=verbose)
 
 
     # main_backdoor(False, False)
     # main_frontdoor(False, False)
-    # main_napkin1(False, False)
+    main_napkin1(False, False)
     # main_napkin2(False, False)
     # main_napkin3(False, False)
-    # main_napkin4(False, False)
-    # main_napkin5(False, False)
-    main_napkin6(False, False)
+    # main_napkin6(False, False)

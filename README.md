@@ -1,5 +1,7 @@
 # DAG Iden Detector
 
+![](pics/canal.jpg)
+
 Iden= Identifiability
 
 ## Code History
@@ -51,7 +53,7 @@ correct or not. The code cannot decide
 whether a do-query is identifiable or not,
 nor can it derive new adjustment formulae.
 What it can do is to check whether an
-adjustment formula is correct or not.
+alledged adjustment formula is correct or not.
 
 ## Our Findings
 
@@ -68,9 +70,9 @@ for a summary of each notebook
 We show that:
 * the backdoor AF is correct
 * the frontdoor AF is correct
-* Cinelli's AF for the napkin OP is INCORRECT
+* Cinelli's AF for the napkin OP is INCORRECT (see Napkin1)
 * We guess an AF for the napkin OP and show 
-that it's correct
+that it's correct (see Napkin1)
 
 
 

@@ -10,7 +10,12 @@ This repo is a superset of a previous github repo of mine:
 https://github.com/rrtucci/napkin-do-calc
 
 The main difference between this repo and the previous one
-is the file **identification.py** and 
+is the 2 files 
+
+1. **identification.py** and 
+
+2. **adjustment_formulae.py**
+
 all the new jupyter notebooks and pics.
 (see **jupyter_notebooks** folder)
 

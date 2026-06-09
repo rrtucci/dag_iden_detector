@@ -15,7 +15,7 @@ all the new jupyter notebooks and pics.
 (see **jupyter_notebooks** folder)
 
 The code pertaining "potentials"
-in this repo and the previous one comes from my previous 
+in this repo and in the previous one comes from my previous 
 repo
 
 https://github.com/artiste-qb-net/quantum-fog
@@ -70,7 +70,7 @@ for a summary of each notebook
 We show that:
 * the backdoor AF is correct
 * the frontdoor AF is correct
-* Cinelli's AF for the napkin OP is INCORRECT (see Napkin1)
+* Cinelli's AF for the napkin OP is INCORRECT (see Napkin4)
 * We guess an AF for the napkin OP and show 
 that it's correct (see Napkin1)
 

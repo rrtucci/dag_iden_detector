@@ -57,8 +57,7 @@ adjustment formula is correct or not.
 
 Pearl has given adjustment formulae (AF) that
 he calls the backdoor AF and frontdoor AF.
-Cinelli has given an AF for the "Napkin" OP [here](https://stats.stackexchange.
-com/questions/514615/do-calculus-for-causal-diagram-7-5-from-the-book-of-why-napkin-problem) 
+Cinelli has given an AF for the "Napkin" OP [here](https://stats.stackexchange.com/questions/514615/do-calculus-for-causal-diagram-7-5-from-the-book-of-why-napkin-problem) 
 
 What we show:
 Our results are presented in jupyter notebooks in the

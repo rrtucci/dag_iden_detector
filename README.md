@@ -12,7 +12,7 @@ https://github.com/rrtucci/napkin-do-calc
 The main difference between this repo and the previous one
 is the 2 files 
 
-1. **identification.py** and 
+1. **identification.py** 
 
 2. **adjustment_formulae.py**
 

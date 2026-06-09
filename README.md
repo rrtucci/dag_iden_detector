@@ -54,6 +54,7 @@ What it can do is to check whether an
 adjustment formula is correct or not.
 
 ## Our Findings
+
 Pearl has given adjustment formulae (AF) that
 he calls the backdoor AF and frontdoor AF.
 Cinelli has given an AF for the "Napkin" OP [here](https://stats.stackexchange.

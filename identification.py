@@ -9,8 +9,8 @@ def create_random_bnet(nodes,
     This method returns a BayesNet object whose structure is given by
     'nodes' and 'arrows'. The TPM (transition probability matrix, a.k.a.
     CPT, conditional probability table) for each node is created at random,
-    with the only constraint being that the number of states of each node be
-    as specified by the input 'nd_to_size'.
+    with the only other constraint being that the number of states of each
+    node be as specified by the input 'nd_to_size'.
 
     Parameters
     ----------
@@ -22,7 +22,7 @@ def create_random_bnet(nodes,
         dictionary mapping node name to its size (i.e., the number of values
         or states). In this method, `nd_to_size` must contain all the nodes.
         In all other methods in this file (for example,
-        in `fill_nod_to_size( )`), `nd_to_size` contains only special nodes
+        in `fill_node_to_size( )`), `nd_to_size` contains only special nodes
         which you don't want to have a default size. Default sizes are 2 for
         non-hidden nodes and 3 for hidden ones.
 
@@ -105,7 +105,7 @@ def fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size=None):
     hidden_nd_names: list[str]
         names of hidden nodes
     nd_to_size: dict[str, int] | None
-        dict mapping node name to its size. This input need only be a
+        dict mapping each node name to its size. This input need only be a
         partial list of those nodes that you don't want to have default values.
 
     Returns
@@ -132,8 +132,7 @@ def calc_ampu_and_full_pots(bnet):
     """
     This method calculates the probability distribution for
 
-    (1) the "full"
-    OP and
+    (1) the "full" OP and
 
     (2) the "ampu" OP. By (ampu=amputated) OP, we mean a bnet whose
     arrows entering node "x" are amputated.
@@ -225,7 +224,7 @@ def print_all_prob_y_bar_x(dot_file,
     only ones used in the jupyter notebooks. All others are meant to be
     internal. This method prints 4 things for each bnet.
     `num_bnet_samples=2` means the default is two bnets, but it will do only
-    bnet if you input `num_bnet_samples=1`
+    one bnet if you input `num_bnet_samples=1`
 
     1. full P(y|x) for OP
 
@@ -321,7 +320,7 @@ def calc_ampu_and_full_prob_y_bar_x_z(bnet,
     The analogous method `calc_ampu_and_full_prob_y_bar_x` calculates P(
     y|x). This method calculates P(y| x, z) instead. If you don't want the
     name of the extra node to be "conditioned on" to default to 'z', you can
-    tell the method the name of your other condition using the input
+    tell the method the name of your alternative to "z" using the input
     variable `other_cond`
 
 

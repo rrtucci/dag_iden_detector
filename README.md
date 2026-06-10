@@ -16,10 +16,10 @@ is the 2 files
 
 2. **adjustment_formulae.py**
 
-all the new jupyter notebooks and pics.
+plus all the new jupyter notebooks and pics.
 (see **jupyter_notebooks** folder)
 
-The code pertaining "potentials"
+The code pertaining to the data structure "Potentials" found
 in this repo and in the previous one comes from my previous 
 repo
 
@@ -51,8 +51,8 @@ OBTAINED WITHOUT CONDUCTING AN RCT
 (Randomized Controlled Trial).
 
 ## What this code can and cannot do
-This repo contains python
-code for checking numerically (on 
+This repo contains Python
+code for checking numerically on 
 an OP with random CPTs (Conditional Probability Tables)
 whether an adjustment formula is 
 correct or not. The code cannot decide
@@ -80,6 +80,12 @@ We show that:
 * We guess an AF for the napkin OP and show 
 that it's correct (see Napkin1)
 
+## Notation
+In the jupyter notebooks, I use the notation $\sum_y\text{ num}$
+in a context such as $P(y) = \frac{ e^{-y}}{\sum_y \text {num}}$
+to mean a normalization constant, i.e., a sum over the 
+numerator 
+of a fraction, so that $\sum_y P(y)=1$.
 
 
 

@@ -7,24 +7,24 @@ def create_random_bnet(nodes,
                        nd_to_size):
     """
     This method returns a BayesNet object whose structure is given by
-    'nodes' and 'arrows'. The TPM (transition probability matrix) for
-    each node is created at random, with the only constraint being that
-    the number of states of each node be as specified by the input
-    'nd_to_size'.
+    'nodes' and 'arrows'. The TPM (transition probability matrix, a.k.a.
+    CPT, conditional probability table) for each node is created at random,
+    with the only constraint being that the number of states of each node be
+    as specified by the input 'nd_to_size'.
 
     Parameters
     ----------
     nodes: list[str]
         example: ['a', 'b', 'c']
     arrows: list[tuple[str, str]]
-        example: [('a', 'b'), ('a', 'c')]
+        example: [('a', 'b'), ('a', 'c')], where ('a', 'b') means a->b
     nd_to_size: dict[str, int]
         dictionary mapping node name to its size (i.e., the number of values
-        or states). In this function, `nd_to_size` must contain all the
-        nodes. In all other functions (for example, in `fill_nod_to_size(
-        )`), `nd_to_size` contains only nodes which you don't want to have a
-        default size. Default sizes are 2 for non-hidden nodes and 3 for
-        hidden ones.
+        or states). In this method, `nd_to_size` must contain all the nodes.
+        In all other methods in this file (for example,
+        in `fill_nod_to_size( )`), `nd_to_size` contains only special nodes
+        which you don't want to have a default size. Default sizes are 2 for
+        non-hidden nodes and 3 for hidden ones.
 
     Returns
     -------
@@ -75,7 +75,7 @@ def randomize_these_nodes(bnet, some_node_names):
         BayesNet object created by `create_random_bnet`. BayesNet or bnet
         stand for Bayesian network.
     some_node_names: list[str]
-        This is a partial list of node names. Normal set equal to the
+        This is a partial list of node names. Normally one uses for this a
         list of nodes that are hidden.
 
     Returns
@@ -92,16 +92,16 @@ def randomize_these_nodes(bnet, some_node_names):
 def fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size=None):
     """
     This method compiles the list of node names from the dot file
-    `dot_file`. It then produces a default dict `nd_to_size` that maps
-    hidden nodes to size 3 (i.e., they will have 3 states) and non-hidden
-    ones to 2. Then the method consults input dict `nd_to_size` and changes
-    the default size in `nd_to_size1` of those nodes mentioned in
-    `nd_to_size1`. Finally, it returns
+    `dot_file`. It then produces a default dict `nd_to_size1` that maps
+    hidden nodes to 3 (i.e., they will have 3 states) and non-hidden ones to
+    2. Then the method overrides `nd_to_size1` with the request of
+    `nd_to_size` whenever they disagree. Finally, the method returns
+    `nd_to_size1`
 
     Parameters
     ----------
     dot_file: str
-        dot file of the OP (Original Promise bnet.
+        dot file (i.e., graphviz format) of the OP (Original Promise) bnet.
     hidden_nd_names: list[str]
         names of hidden nodes
     nd_to_size: dict[str, int] | None
@@ -130,13 +130,18 @@ def fill_nd_to_size(dot_file, hidden_nd_names, nd_to_size=None):
 
 def calc_ampu_and_full_pots(bnet):
     """
-    This method calculates the probability distribution for (1) the "full"
-    OP and (2) the "ampu" OP. By (ampu=amputated) OP, we mean a bnet whose
-    arrows entering node "x" are amputated. These two probability
-    distributions are loaded into 2 Potential objects, `full_pot` and
-    `dot_pot` which the method returns. Remember, a Potential can be thought
+    This method calculates the probability distribution for
+
+    (1) the "full"
+    OP and
+
+    (2) the "ampu" OP. By (ampu=amputated) OP, we mean a bnet whose
+    arrows entering node "x" are amputated.
+
+    These two probability distributions are outputted as 2 Potential
+    objects, `full_pot` and `dot_pot`. Remember, a Potential can be thought
     of an arbitrary function f(x,y,z) where `x,y,z` are a partial list of
-    the nodes of the OP bnet. A potential is usually used to carry either a
+    the nodes of the OP bnet. A Potential is usually used to carry either a
     joint probability distribution like P(x,y,z) or a conditional one like
     P(z| x, y).
 
@@ -169,10 +174,11 @@ def calc_ampu_and_full_prob_y_bar_x(bnet,
                                     ampu_pot,
                                     full_pot):
     """
-    This takes the two Potentials `ampu_pot` and `full_pot` and calculates
-    from those the two conditional probabilities `ampu_prob_y_bar_x`,
-    `full_prob_y_bar_x'. The probabilities are of the type P(y|x) and
-    expressed as numpy arrays. `ampu_prob_y_bar_x` equals P(y|do(x)).
+    This method takes the two Potentials `ampu_pot` and `full_pot` and
+    calculates from these the two conditional probabilities
+    `ampu_prob_y_bar_x`, `full_prob_y_bar_x'. The probabilities are of the
+    type P(y|x) and expressed as numpy arrays. `ampu_prob_y_bar_x` equals P(
+    y|do(x)).
 
     Parameters
     ----------
@@ -217,35 +223,36 @@ def print_all_prob_y_bar_x(dot_file,
     """
     This method and the analogous one `print_all_prob_y_bar_x_z` are the
     only ones used in the jupyter notebooks. All others are meant to be
-    internal. This method prints 4 things for either 1 or 2 bnets. The default
-    is two bnets `num_bnet_samples=2`, but it will do just bnet if you input
-    `num_bnet_samples=1`
+    internal. This method prints 4 things for each bnet.
+    `num_bnet_samples=2` means the default is two bnets, but it will do only
+    bnet if you input `num_bnet_samples=1`
 
     1. full P(y|x) for OP
 
-    2. amputated P(y|x) for OP. This requires data from an RCT to
-    calculated in real life.
+    2. amputated P(y|x) for OP. Calculating this in real life requires data
+    from an RCT.
 
     3. adjusted P(y|x) from full_pot
 
-    4. adjusted P(y|x) from ampu_pot. This requires data from an RCT to
-    calculated in real life.
+    4. adjusted P(y|x) from ampu_pot. Calculating this in real life requires
+    data from an RCT.
 
 
     Parameters
     ----------
     dot_file: str
-        the dot file of the OP bnet
+        the dot file (i.e., graphviz format) of the OP bnet
     hidden_nd_names: list[str]
         the names of the hidden nodes
     nd_to_size: dict[str, int]| None
         a node name to node size dict for those nodes that you don't want to
         have default sizes.
     verbose: bool
-        the verbose mode prints also the CPT for each node of the bnet.
+        if this is set to True, the method prints also the CPT of each node
+        of the bnet.
     adj_version: int
-        adjustment version. For the Napkin OP, there are current 4
-        adjustment formulae that are tested.
+        the adjustment formula version. For the Napkin OP, there are
+        currently 4 adjustment formulae that are tested.
     num_bnet_samples: int
         number of random bnets considered. This can be either 1 or 2.
 
@@ -313,9 +320,9 @@ def calc_ampu_and_full_prob_y_bar_x_z(bnet,
     """
     The analogous method `calc_ampu_and_full_prob_y_bar_x` calculates P(
     y|x). This method calculates P(y| x, z) instead. If you don't want the
-    name of the extra node to be conditioned on to default to 'z', you can
-    tell the method the name of your condition using the str input variable
-    `other_cond`
+    name of the extra node to be "conditioned on" to default to 'z', you can
+    tell the method the name of your other condition using the input
+    variable `other_cond`
 
 
     Parameters

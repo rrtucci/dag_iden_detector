@@ -12,9 +12,9 @@ https://github.com/rrtucci/napkin-do-calc
 The main difference between this repo and the previous one
 is the 2 files 
 
-1. **identification.py** 
+1. [identification.py](https://github.com/rrtucci/dag_iden_detector/blob/master/identification.py)
 
-2. **adjustment_formulae.py**
+2. [adjustment_formulae.py](https://github.com/rrtucci/dag_iden_detector/blob/master/adjustment_formulae.py)
 
 plus all the new jupyter notebooks and pics.
 (see **jupyter_notebooks** folder)

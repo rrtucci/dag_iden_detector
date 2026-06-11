@@ -549,7 +549,7 @@ if __name__ == "__main__":
 
     # main_backdoor(False, False)
     # main_frontdoor(False, False)
-    main_napkin1(False, False)
+    # main_napkin1(False, False)
     # main_napkin2(False, False)
-    # main_napkin3(False, False)
+    main_napkin3(False, False)
     # main_napkin6(False, False)

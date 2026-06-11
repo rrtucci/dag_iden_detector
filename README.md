@@ -55,8 +55,9 @@ This repo contains Python
 code for checking numerically on 
 an OP with random CPTs (Conditional Probability Tables)
 whether an adjustment formula is 
-correct or not. The code cannot decide
-whether a do-query is identifiable or not,
+correct or not. The code cannot tell its users
+whether any or how many adjustment formulae 
+exist for a given OP,
 nor can it derive new adjustment formulae.
 What it can do is to check whether an
 alledged adjustment formula is correct or not.

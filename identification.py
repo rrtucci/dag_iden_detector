@@ -402,7 +402,7 @@ def print_all_prob_y_bar_x_z(dot_file,
         bnet_strings = ["bnet1", "bnet2"]
     for bnet_str in bnet_strings:
         if bnet_str == "bnet2":
-            print("------------------------------")
+            print("--------------Now randomizing hidden nodes of bnet1")
             randomize_these_nodes(bnet, hidden_nd_names)
         print(f"Random {bnet_str}:")
         if verbose:
